@@ -16,6 +16,11 @@
 03A4: name_thread 'BETA_HOOKER'
 
 :BETA_HOOKER
+0001: wait 0 ms
+04ED: load_animation "BLOWJOBZ" 
+04ED: load_animation "SEX_CAR" 
+04ED: load_animation "CAR_CHAT" 
+038B: load_requested_models
 jump @INIT
 
 :INIT
@@ -44,7 +49,6 @@ else_jump @INIT
 089F: get_actor 3@ pedtype_to 4@
 if 4@ == 22 
 else_jump @INIT
-gosub @LOAD
 jump @FIND_PLACE
 
 :FIND_PLACE
@@ -241,12 +245,4 @@ end
 0@ = Actor.Health($PLAYER_ACTOR)
 0@ += 25 
 Actor.Health($PLAYER_ACTOR) = 0@
-return
-
-:LOAD
-0001: wait 0 ms
-04ED: load_animation "BLOWJOBZ" 
-04ED: load_animation "SEX_CAR" 
-04ED: load_animation "CAR_CHAT" 
-038B: load_requested_models
 return
