@@ -1,0 +1,250 @@
+// THIS MOD CREATED BY heri hover
+
+//00BC GXT 'PROS_01' // "We need to find somewhere more secluded"
+//00BC GXT 'PROS_09' // "Stop wasting my time!"
+//00BC GXT 'PROS_02' // "This seems an ok place"
+// VARIABLES:
+// 0@: Health
+// 1@: CarTarget
+// 2@: CarSeat
+// 3@: HookerTarget
+// 4@: PedType
+// 5@, 6@, 7@: HookerPosition
+// 8@: PedsAroundTargetHooker
+
+{$CLEO .cs}
+03A4: name_thread 'BETA_HOOKER'
+
+:BETA_HOOKER
+04ED: load_animation "BLOWJOBZ" 
+04ED: load_animation "SEX_CAR" 
+04ED: load_animation "CAR_CHAT" 
+jump @INIT
+
+:INIT
+wait 50      
+if 
+00DF:   actor $PLAYER_ACTOR driving 
+else_jump @INIT    
+if and
+Player.Defined($PLAYER_CHAR)
+$ONMISSION == 0 
+847A:   not actor $PLAYER_ACTOR driving_bike 
+84A7:   not actor $PLAYER_ACTOR driving_boat 
+84C8:   not actor $PLAYER_ACTOR driving_flying_vehicle 
+84A9:   not actor $PLAYER_ACTOR driving_heli 
+else_jump @INIT    
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+01EA: 2@ = car 1@ max_passengers
+if 2@ > 0
+else_jump @INIT        
+01E9: 2@ = car 1@ num_passengers
+if 2@ > 0
+else_jump @INIT
+if 8431:   not car 1@ passenger_seat_free 0  
+else_jump @INIT
+0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
+089F: get_actor 3@ pedtype_to 4@
+if 4@ == 22 
+else_jump @INIT
+jump @FIND_PLACE
+
+:FIND_PLACE
+wait 2000 
+Actor.StorePos(3@, 5@, 6@, 7@)
+073F: get_actor_in_sphere 5@ 6@ 7@ radius 25.0 with_pedtype_civilian 1 gang 1 criminal/prostitute 0 handle_as 8@  
+if
+    01C1:   is_car_stopped 1@
+then 
+    wait 1000
+    if
+    8@ < 1 
+    then
+        00BC: show_text_highpriority GXT 'PROS_02' time 4000 flag 1 // "This seems an ok place"
+        0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+        wait 1500
+        jump @PLACE_OK
+    else
+        00BC: show_text_highpriority GXT 'PROS_01' time 4000 flag 1 // "We need to find somewhere more secluded"
+        jump @FIND_PLACE
+    end
+else 
+    jump @FIND_PLACE
+end
+
+:PLACE_OK
+wait 0
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
+if and
+Actor.InCar(3@, 1@)
+Actor.InCar($PLAYER_ACTOR, 1@)
+else_jump @INIT 
+wait 0 
+if or
+856E:   not car 1@ defined
+856D:   not actor 3@ defined
+then jump @INIT
+end
+03C8: set_camera_directly_before_player
+gosub @LOCK
+0605: actor $PLAYER_ACTOR perform_animation "CAR_SC4_FL" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1 
+0605: actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1 
+jump @FOREPLAY
+
+:FOREPLAY
+wait 0
+if 
+   Player.Defined($PLAYER_CHAR)
+else_jump @INIT 
+if or
+856E:   not car 1@ defined
+856D:   not actor 3@ defined
+then jump @INIT
+end
+03FE: set_actor 3@ money 5
+Player.Money($PLAYER_CHAR) += -5
+0624: add 5.0 to_float_stat 33
+0605: actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+gosub @HEALTH_UP
+wait 1500
+if or
+856E:   not car 1@ defined
+856D:   not actor 3@ defined
+then jump @INIT
+end
+jump @WATCH_FP 
+
+:BANGBANG 
+if or
+856E:   not car 1@ defined
+856D:   not actor 3@ defined
+then jump @INIT
+end
+03FE: set_actor 3@ money 10
+Player.Money($PLAYER_CHAR) += -10 
+0624: add 10.0 to_float_stat 33
+0605: actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
+0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
+gosub @HEALTH_UP
+wait 3000 
+if or
+856E:   not car 1@ defined
+856D:   not actor 3@ defined
+then jump @INIT
+end
+jump @WATCH_GG
+
+:JACKED_FP
+0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
+0605: actor 3@ perform_animation "BJ_CAR_END_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+return
+
+:JACKED_GG
+0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+0605: actor 3@ perform_animation "SEX_CAR_END_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+return
+
+:ENDED
+0687: clear_actor $PLAYER_ACTOR task
+0687: clear_actor 3@ task
+01C2: remove_references_to_actor 3@
+gosub @UNLOCK
+wait 5000
+jump @INIT 
+
+:UNLOCK
+wait 0
+0526: set_actor 3@ stay_in_car_when_jacked 0   
+039E: set_actor 3@ locked 1 while_in_car 
+07CC: set_player 3@ can_enter_exit_vehicles 0
+0633: AS_actor 3@ exit_car
+05DE: AS_actor 3@ walk_around_ped_path 
+0526: set_actor $PLAYER_ACTOR stay_in_car_when_jacked 0 
+return
+
+:LOCK
+0526: set_actor 3@ stay_in_car_when_jacked 1   
+039E: set_actor 3@ locked 1 while_in_car 
+07CC: set_player 3@ can_enter_exit_vehicles 0 
+0526: set_actor $PLAYER_ACTOR stay_in_car_when_jacked 1 
+return
+
+:WATCH_FP
+wait 0
+30@ = 0 // timer
+jump @WATCH_FP0
+
+:WATCH_FP0
+0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
+wait 100
+05C1: AS_actor 3@ speak_from_audio_table 285
+00D6: if or
+00E1:   player 0 pressed_key 14 // Acelerate
+00E1:   player 0 pressed_key 15 // Exit
+00E1:   player 0 pressed_key 16 // Brake/Reverse
+then
+    30@ = 5000
+    00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
+    if 00E1:   player 0 pressed_key 15 // Exit
+    then
+        gosub @UNLOCK
+        0633: AS_actor 3@ exit_car
+    else
+        gosub @JACKED_FP
+    end
+    jump @ENDED
+else 
+    30@ += 100
+    if 30@ < 5000
+    then
+        jump @WATCH_FP0
+    else
+        gosub @JACKED_FP
+        wait 2000 
+        jump @BANGBANG
+    end
+end
+
+:WATCH_GG
+wait 0
+30@ = 0 // timer
+jump @WATCH_GG0
+
+:WATCH_GG0
+wait 0 
+0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
+wait 100
+05C1: AS_actor 3@ speak_from_audio_table 116
+00D6: if or
+00E1:   player 0 pressed_key 14 // Acelerate
+00E1:   player 0 pressed_key 15 // Exit
+00E1:   player 0 pressed_key 16 // Brake/Reverse
+then
+    30@ = 17000
+    00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
+    if 00E1:   player 0 pressed_key 15 // Exit
+    then
+        gosub @UNLOCK
+        0633: AS_actor 3@ exit_car
+    else
+        gosub @JACKED_GG
+    end
+    jump @ENDED
+else
+    30@ += 100
+    if 30@ < 17000 
+    then
+        jump @WATCH_GG0
+    else
+        gosub @JACKED_GG
+        wait 5000 
+        jump @ENDED
+    end
+end
+
+:HEALTH_UP
+0@ = Actor.Health($PLAYER_ACTOR)
+0@ += 25 
+Actor.Health($PLAYER_ACTOR) = 0@
+return
