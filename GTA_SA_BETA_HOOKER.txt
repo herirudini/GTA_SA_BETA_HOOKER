@@ -93,46 +93,41 @@ jump @FOREPLAY
 
 :FOREPLAY
 wait 0
-if 
-   Player.Defined($PLAYER_CHAR)
-else_jump @INIT 
 if or
 856E:   not car 1@ defined
 856D:   not actor 3@ defined
-then jump @INIT
-end
-03FE: set_actor 3@ money 5
-Player.Money($PLAYER_CHAR) += -5
-0624: add 5.0 to_float_stat 33
+then 
+jump @INIT
+else
+gosub @MONEY
 0605: actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
 0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
 gosub @HEALTH_UP
 wait 1500
-if or
-856E:   not car 1@ defined
-856D:   not actor 3@ defined
-then jump @INIT
-end
 jump @WATCH_FP 
+end
+
+:MONEY
+wait 0
+03FE: set_actor 3@ money 5
+Player.Money($PLAYER_CHAR) += -5
+0624: add 5.0 to_float_stat 33
+return
+
+:MONEY2
+wait 0
+03FE: set_actor 3@ money 10
+Player.Money($PLAYER_CHAR) += -10
+0624: add 10.0 to_float_stat 33
+return
 
 :BANGBANG 
-if or
-856E:   not car 1@ defined
-856D:   not actor 3@ defined
-then jump @INIT
-end
-03FE: set_actor 3@ money 10
-Player.Money($PLAYER_CHAR) += -10 
-0624: add 10.0 to_float_stat 33
+wait 0
+gosub @MONEY2
 0605: actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
 0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
 gosub @HEALTH_UP
 wait 3000 
-if or
-856E:   not car 1@ defined
-856D:   not actor 3@ defined
-then jump @INIT
-end
 jump @WATCH_GG
 
 :JACKED_FP
@@ -221,7 +216,7 @@ wait 100
 00E1:   player 0 pressed_key 15 // Exit
 00E1:   player 0 pressed_key 16 // Brake/Reverse
 then
-    30@ = 17000
+    30@ = 19000
     00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
     if 00E1:   player 0 pressed_key 15 // Exit
     then
@@ -233,7 +228,7 @@ then
     jump @ENDED
 else
     30@ += 100
-    if 30@ < 17000 
+    if 30@ < 19000 
     then
         jump @WATCH_GG0
     else
