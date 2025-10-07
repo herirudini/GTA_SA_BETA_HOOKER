@@ -11,6 +11,8 @@
 // 4@: PedType
 // 5@, 6@, 7@: HookerPosition
 // 8@: PedsAroundTargetHooker
+// 9@: Timer
+// 10@: Speed
 
 {$CLEO .cs}
 03A4: name_thread 'BETA_HOOKER'
@@ -124,6 +126,7 @@ jump @INIT
 
 :UNLOCK
 0001: wait 0 ms
+07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0  //reset car bouncing
 0526: set_actor 3@ stay_in_car_when_jacked 0   
 039E: set_actor 3@ locked 1 while_in_car 
 07CC: set_player 3@ can_enter_exit_vehicles 0
@@ -140,21 +143,19 @@ return
 return
 
 :WATCH_FP
-0001: wait 0 ms
-gosub @IN_CAR
+0001: wait 1000 ms 
+gosub @IN_CAR 
 0605: actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
 0001: wait 1500 ms
 gosub @IN_CAR
 0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
-30@ = 0 // timer
+9@ = 0 // timer
 jump @WATCH_FP0
 
 :WATCH_FP0
 0001: wait 2000 ms
 gosub @IN_CAR 
 0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
-05C1: AS_actor 3@ speak_from_audio_table 285
 00D6: if
 00E1:   player 0 pressed_key 15 // Exit
 then
@@ -190,21 +191,39 @@ end
 
 :WATCH_GG
 0001: wait 0 ms
-30@ = 0 // timer
+9@ = 0
+10@ = 300
 jump @WATCH_GG0
 
 :WATCH_GG0
 0001: wait 0 ms
 gosub @IN_CAR
+if 9@ > 5000
+then
+10@ = 200
+end
+if 9@ > 8000
+then
+10@ = 150
+end
+if 9@ > 12000
+then
+10@ = 100
+end
+if 9@ > 17000
+then
+10@ = 50
+end
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
-0001: wait 100 ms
+gosub @BOUNCE
+0001: wait 10@ ms   
 05C1: AS_actor 3@ speak_from_audio_table 116
 00D6: if or
 00E1:   player 0 pressed_key 14 // Acelerate
 00E1:   player 0 pressed_key 15 // Exit
 00E1:   player 0 pressed_key 16 // Brake/Reverse
 then
-    30@ = 19000
+    9@ = 18000
     00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
     if 00E1:   player 0 pressed_key 15 // Exit
     then
@@ -215,8 +234,8 @@ then
     end
     jump @ENDED
 else
-    30@ += 100
-    if 30@ < 19000 
+    9@ = 9@ + 10@
+    if 9@ < 18000 
     then
         jump @WATCH_GG0
     else
@@ -225,6 +244,13 @@ else
         jump @ENDED
     end
 end
+
+:BOUNCE
+// apply bouncing 
+07D5: set_car 1@ velocity_in_direction_XYZ 0.01 0.0 -0.03 rotation_velocitiesXY -0.01 0.0 unk 0.0
+0001: wait 10@ ms
+07D5: set_car 1@ velocity_in_direction_XYZ -0.01 0.0 0.01 rotation_velocitiesXY 0.01 0.0 unk 0.0
+return
 
 :IN_CAR
 0001: wait 0 ms
