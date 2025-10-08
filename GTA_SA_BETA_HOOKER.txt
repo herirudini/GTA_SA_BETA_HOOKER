@@ -126,10 +126,11 @@ jump @INIT
 
 :UNLOCK
 0001: wait 0 ms
-07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0  //reset car bouncing
+01C3: remove_references_to_car 10@  //reset car bouncing
+07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0
 0526: set_actor 3@ stay_in_car_when_jacked 0   
-039E: set_actor 3@ locked 1 while_in_car 
-07CC: set_player 3@ can_enter_exit_vehicles 0
+039E: set_actor 3@ locked 0 while_in_car 
+07CC: set_player 3@ can_enter_exit_vehicles 1
 0633: AS_actor 3@ exit_car
 05DE: AS_actor 3@ walk_around_ped_path 
 0526: set_actor $PLAYER_ACTOR stay_in_car_when_jacked 0 
@@ -192,7 +193,7 @@ end
 :WATCH_GG
 0001: wait 0 ms
 9@ = 0
-10@ = 300
+10@ = 300 
 jump @WATCH_GG0
 
 :WATCH_GG0
@@ -247,9 +248,14 @@ end
 
 :BOUNCE
 // apply bouncing 
-07D5: set_car 1@ velocity_in_direction_XYZ 0.01 0.0 -0.03 rotation_velocitiesXY -0.01 0.0 unk 0.0
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+0209: 11@ = random_int_in_ranges  -0.03 -0.02
+0209: 12@ = random_int_in_ranges -0.03 -0.02
+07D5: set_car 1@ velocity_in_direction_XYZ 11@ 0.0 12@ rotation_velocitiesXY 12@ 0.0 unk -0.01
+01C3: remove_references_to_car 10@
 0001: wait 10@ ms
-07D5: set_car 1@ velocity_in_direction_XYZ -0.01 0.0 0.01 rotation_velocitiesXY 0.01 0.0 unk 0.0
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
 return
 
 :IN_CAR
