@@ -11,8 +11,9 @@
 // 4@: PedType
 // 5@, 6@, 7@: HookerPosition
 // 8@: PedsAroundTargetHooker
-// 9@: Timer
-// 10@: Speed
+// 9@: LoopSpeed
+// 10@ 11@ 12@ 13@ 14@: Timers
+// 15@ 16@: RandomNumber
 
 {$CLEO .cs}
 03A4: name_thread 'BETA_HOOKER'
@@ -23,9 +24,39 @@
 04ED: load_animation "SEX_CAR" 
 04ED: load_animation "CAR_CHAT" 
 038B: load_requested_models
-jump @INIT
+0001: wait 0 ms  
+var            
+    0@: Integer
+    9@: Integer
+    10@: Integer
+    11@: Integer
+    12@: Integer
+    13@: Integer
+    14@: Integer
+    15@: Integer
+    16@: Integer
+end     
+jump @RESET
 
-:INIT
+:RESET 
+0@ = 0
+1@ = 0
+2@ = 0
+4@ = 0
+5@ = 0
+6@ = 0
+7@ = 0
+9@ = 0
+10@ = 0
+11@ = 0
+12@ = 0
+13@ = 0
+14@ = 0
+15@ = 0
+16@ = 0 
+jump @INIT 
+
+:INIT 
 0001: wait 0 ms
 if 
 00DF:   actor $PLAYER_ACTOR driving 
@@ -51,232 +82,129 @@ else_jump @INIT
 089F: get_actor 3@ pedtype_to 4@
 if 4@ == 22 
 else_jump @INIT
-gosub @LOCK
 jump @PREPARE
 
 :PREPARE
-0001: wait 0 ms
-gosub @IN_CAR
-gosub @LOCK    
-0001: wait 0 ms
-if or
-856E:   not car 1@ defined
-856D:   not actor 3@ defined
-then jump @INIT
-end
-0605: actor $PLAYER_ACTOR perform_animation "CAR_SC4_FL" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1 
-0605: actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1 
+0001: wait 100 ms
+gosub @LOCK
+0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1 
 jump @FOREPLAY
 
 :FOREPLAY
 0001: wait 0 ms
-if or
-856E:   not car 1@ defined
-856D:   not actor 3@ defined
-then 
-jump @INIT
-else
-gosub @MONEY
-gosub @HEALTH_UP
-jump @WATCH_FP 
-end
-
-:MONEY
-0001: wait 0 ms
 03FE: set_actor 3@ money 5
 Player.Money($PLAYER_CHAR) += -5
 0624: add 5.0 to_float_stat 33
-return
+gosub @WAIT_1000 
+0605: As_actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
+gosub @WAIT_500 
+0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
+jump @WATCH_FP
 
-:MONEY2
+:WATCH_FP
 0001: wait 0 ms
-03FE: set_actor 3@ money 10
-Player.Money($PLAYER_CHAR) += -10
-0624: add 10.0 to_float_stat 33
+gosub @WAIT_1000
+gosub @WAIT_500 
+0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
+if
+    01C1:   is_car_stopped 1@
+then 
+    gosub @WAIT_1000 
+    Actor.StorePos(3@, 5@, 6@, 7@)
+    073F: get_actor_in_sphere 5@ 6@ 7@ radius 25.0 with_pedtype_civilian 1 gang 1 criminal/prostitute 0 handle_as 8@
+    if
+    8@ < 1 
+    then
+        00BC: show_text_highpriority GXT 'PROS_02' time 4000 flag 1 // "This seems an ok place"
+        03C8: set_camera_directly_before_player
+        gosub @JACKED_FP
+        jump @BANGBANG
+    else
+        00BC: show_text_highpriority GXT 'PROS_01' time 4000 flag 1 // "We need to find somewhere more secluded"
+        jump @WATCH_FP
+    end
+else 
+    jump @WATCH_FP
+end
+
+:JACKED_FP 
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1     
+0605: actor 3@ perform_animation "BJ_CAR_END_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+gosub @WAIT_500 
+gosub @HEALTH_UP
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
 return
 
 :BANGBANG 
 0001: wait 0 ms
-gosub @IN_CAR
-gosub @LOCK
-gosub @MONEY2
-0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
-0605: actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
-gosub @HEALTH_UP
-0001: wait 3000 ms
-jump @WATCH_GG
+03FE: set_actor 3@ money 10
+Player.Money($PLAYER_CHAR) += -10
+0624: add 10.0 to_float_stat 33
+0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
+0605: As_actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
+gosub @WAIT_500 
+0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
+10@ = 18000
+9@ = 500 
+jump @WATCH_BB
 
-:JACKED_FP
-gosub @IN_CAR
-gosub @LOCK
-0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
-0605: actor 3@ perform_animation "BJ_CAR_END_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-return
-
-:JACKED_GG
-gosub @IN_CAR
-gosub @LOCK
-0605: actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-0605: actor 3@ perform_animation "SEX_CAR_END_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-return
-
-:ENDED
-0687: clear_actor $PLAYER_ACTOR task
-0687: clear_actor 3@ task
-01C2: remove_references_to_actor 3@
-gosub @UNLOCK
-0001: wait 5000 ms
-jump @INIT 
-
-:UNLOCK
+:WATCH_BB
 0001: wait 0 ms
-01C3: remove_references_to_car 10@  //reset car bouncing
-07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0
-0526: set_actor 3@ stay_in_car_when_jacked 0   
-039E: set_actor 3@ locked 0 while_in_car 
-07CC: set_player 3@ can_enter_exit_vehicles 1
-0633: AS_actor 3@ exit_car
-05DE: AS_actor 3@ walk_around_ped_path 
-0526: set_actor $PLAYER_ACTOR stay_in_car_when_jacked 0 
-return
-
-:LOCK
-0526: set_actor 3@ stay_in_car_when_jacked 1   
-039E: set_actor 3@ locked 1 while_in_car 
-07CC: set_player 3@ can_enter_exit_vehicles 0 
-0526: set_actor $PLAYER_ACTOR stay_in_car_when_jacked 1 
-return
-
-:WATCH_FP
-0001: wait 1000 ms 
-gosub @IN_CAR 
-0605: actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-0001: wait 1500 ms
-gosub @IN_CAR
-0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
-9@ = 0 // timer
-jump @WATCH_FP0
-
-:WATCH_FP0
-0001: wait 2000 ms
-gosub @IN_CAR 
-gosub @LOCK
-0812: AS_actor 3@ perform_animation "BJ_CAR_LOOP_W" IFP "BLOWJOBZ" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1
-00D6: if
-00E1:   player 0 pressed_key 15 // Exit
+if 10@ < 12000
 then
-    00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
-    gosub @UNLOCK
-    0633: AS_actor 3@ exit_car
-    jump @ENDED
-else 
-    if
-        01C1:   is_car_stopped 1@
-    then 
-        0001: wait 1000 ms
-        Actor.StorePos(3@, 5@, 6@, 7@)
-        073F: get_actor_in_sphere 5@ 6@ 7@ radius 25.0 with_pedtype_civilian 1 gang 1 criminal/prostitute 0 handle_as 8@
-        if
-        8@ < 1 
-        then
-            00BC: show_text_highpriority GXT 'PROS_02' time 4000 flag 1 // "This seems an ok place"
-            03C8: set_camera_directly_before_player
-            0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
-            gosub @JACKED_FP
-            0001: wait 2000 ms
-            0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
-            jump @BANGBANG
-        else
-            00BC: show_text_highpriority GXT 'PROS_01' time 4000 flag 1 // "We need to find somewhere more secluded"
-            jump @WATCH_FP0
-        end
-    else 
-        jump @WATCH_FP0
-    end
+9@ = 300
 end
-
-:WATCH_GG
-0001: wait 0 ms
-9@ = 0
-10@ = 300 
-jump @WATCH_GG0
-
-:WATCH_GG0
-0001: wait 0 ms
-gosub @IN_CAR
-gosub @LOCK
-if 9@ > 5000
+if 10@ < 8000
 then
-10@ = 200
+9@ = 200
 end
-if 9@ > 8000
+if 10@ < 4000
 then
-10@ = 150
-end
-if 9@ > 12000
-then
-10@ = 100
-end
-if 9@ > 17000
-then
-10@ = 50
+9@ = 100
 end
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 gosub @BOUNCE
-0001: wait 10@ ms   
 05C1: AS_actor 3@ speak_from_audio_table 116
+10@ = 10@ - 9@
 00D6: if or
 00E1:   player 0 pressed_key 14 // Acelerate
-00E1:   player 0 pressed_key 15 // Exit
 00E1:   player 0 pressed_key 16 // Brake/Reverse
 then
-    9@ = 18000
-    00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
-    if 00E1:   player 0 pressed_key 15 // Exit
-    then
-        gosub @UNLOCK
-        0633: AS_actor 3@ exit_car
-    else
-        gosub @JACKED_GG
-    end
-    jump @ENDED
+    10@ = 0
+    jump @WASTING
 else
-    9@ = 9@ + 10@
-    if 9@ < 18000 
+    if 10@ <= 0 
     then
-        jump @WATCH_GG0
-    else
         gosub @JACKED_GG
-        0001: wait 5000 ms
         jump @ENDED
+    else     
+        jump @WATCH_BB
     end
 end
 
 :BOUNCE
-// apply bouncing 
-0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
-0209: 11@ = random_int_in_ranges  -0.03 -0.025
-0209: 12@ = random_int_in_ranges -0.035 -0.03
 0001: wait 0 ms
-07D5: set_car 1@ velocity_in_direction_XYZ 11@ 0.0 12@ rotation_velocitiesXY 12@ 0.0 unk -0.01
-01C3: remove_references_to_car 10@
-0001: wait 10@ ms
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0209: 16@ = random_int_in_ranges  -0.03 -0.025
+0209: 15@ = random_int_in_ranges -0.035 -0.03
+// apply bouncing 
+07D5: set_car 1@ velocity_in_direction_XYZ 16@ 0.0 15@ rotation_velocitiesXY 0.0 0.0 unk -0.01  
+01C3: remove_references_to_car 1@
+gosub @WAIT_BB
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
 return
 
-:IN_CAR
-0001: wait 0 ms
-if and
-Actor.InCar(3@, 1@)
-Actor.InCar($PLAYER_ACTOR, 1@)
-then
-0001: wait 0 ms
-else 
-gosub @UNLOCK
-0633: AS_actor 3@ exit_car
-jump @ENDED
-end
+:JACKED_GG
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+0605: As_actor 3@ perform_animation "SEX_CAR_END_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
+gosub @WAIT_1000
+gosub @HEALTH_UP
+gosub @WAIT_500 
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
 return
 
 :HEALTH_UP
@@ -285,3 +213,114 @@ return
 0@ += 25 
 Actor.Health($PLAYER_ACTOR) = 0@
 return
+
+:WASTING
+00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
+jump @ENDED
+
+:CHECK
+gosub @NOT_DEAD
+gosub @IN_CAR
+gosub @LOCK
+return
+
+:NOT_DEAD
+0001: wait 0 ms
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
+if or
+0118: actor $PLAYER_ACTOR dead 
+0118: actor 3@ dead
+0112: has_deatharrest_been_executed 
+then
+jump @ENDED
+else
+return
+end
+
+:IN_CAR
+0001: wait 0 ms
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
+if and
+00DB: actor $PLAYER_ACTOR in_car 1@  
+00DB: actor 3@ in_car 1@
+then 
+    if
+    //00E1: player 0 pressed_key 15 // Exit 
+    08A7:   is_car_door_fully_open 1@ door 2
+    then
+    jump @WASTING
+    else
+    return       
+    end
+else
+jump @WASTING
+end
+
+:LOCK
+0001: wait 0 ms
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
+0526: set_actor 3@ stay_in_car_when_jacked 1   
+039E: set_actor 3@ locked 1 while_in_car 
+07CC: set_player 3@ can_enter_exit_vehicles 0
+return
+
+:WAIT_300
+0001: wait 0 ms
+11@ = 300
+repeat
+gosub @CHECK
+11@ -= 100
+0001: wait 100 ms
+until 11@ <= 0
+return
+
+:WAIT_500
+0001: wait 0 ms
+12@ = 500
+repeat
+gosub @CHECK
+12@ -= 100
+0001: wait 100 ms
+until 12@ <= 0
+return
+
+:WAIT_1000
+0001: wait 0 ms
+13@ = 2000
+repeat
+gosub @CHECK
+13@ -= 100
+0001: wait 100 ms
+until 13@ <= 0
+return
+
+:WAIT_BB
+0001: wait 0 ms
+14@ = 9@
+repeat
+gosub @CHECK
+14@ -= 100
+0001: wait 100 ms
+until 14@ <= 0
+return 
+
+:ENDED
+0001: wait 0 ms
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
+0687: clear_actor $PLAYER_ACTOR task
+1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
+0526: set_actor 3@ stay_in_car_when_jacked 0   
+039E: set_actor 3@ locked 0 while_in_car 
+07CC: set_player 3@ can_enter_exit_vehicles 1   
+0633: AS_actor 3@ exit_car
+05DE: AS_actor 3@ walk_around_ped_path
+0687: clear_actor 3@ task
+01C2: mark_char_as_no_longer_needed 3@
+07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0
+01C3: mark_car_as_no_longer_needed 1@  
+0001: wait 3000 ms   
+jump @RESET
