@@ -175,6 +175,7 @@ end
 :BOUNCE
 0001: wait 0 ms
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
 // apply bouncing 
 if 15@ == 0
 then
@@ -187,13 +188,14 @@ else
 15@ = 0
 end
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
 return
 
 :JACKED_GG
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
 0605: As_actor 3@ perform_animation "SEX_CAR_END_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
-gosub @WAIT_1000
+gosub @WAIT_500
 gosub @HEALTH_UP
 gosub @WAIT_500 
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
