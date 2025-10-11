@@ -13,7 +13,7 @@
 // 8@: PedsAroundTargetHooker
 // 9@: LoopSpeed
 // 10@ 11@ 12@ 13@ 14@: Timers
-// 15@ 16@: RandomNumber
+// 15@ 16@ 17@ 18@: RandomNumber
 
 {$CLEO .cs}
 03A4: name_thread 'BETA_HOOKER'
@@ -35,6 +35,8 @@ var
     14@: Integer
     15@: Integer
     16@: Integer
+    17@: Integer
+    18@: Integer
 end     
 gosub @RESET
 jump @INIT 
@@ -130,28 +132,31 @@ Player.Money($PLAYER_CHAR) += -10
 gosub @WAIT_500 
 gosub @WAIT_300
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
-10@ = 8000
+10@ = 6000
 15@ = 0
-17@ = 2.0
-9@ = 75
-16@ = 0.05
+9@ = 25
+16@ = -0.045
+17@ = 0.02
+18@ = -0.02
 jump @WATCH_BB
 
 :WATCH_BB
 0001: wait 0 ms
-if 10@ < 5000
+if 10@ < 3000
+then
+9@ = 25 
+16@ = 0.05
+17@ = 0.025
+18@ = -0.025
+end
+if 10@ < 1000
 then
 9@ = 25
-16@ = 0.05
-17@ = 3.0
+16@ = 0.055
+17@ = 0.02
+18@ = -0.02
 end
-if 10@ < 2000
-then
-9@ = 50 
-16@ = 0.045
-17@ = 2.5
-end
-0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 17@ loopA 1 lockX 0 lockY 0 lockF 0 time -1 
+0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 1.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 gosub @BOUNCE
 gosub @WAIT_BB
 05C1: AS_actor 3@ speak_from_audio_table 116
@@ -179,11 +184,11 @@ end
 // apply bouncing 
 if 15@ == 0
 then
-07D5: set_car 1@ velocity_in_direction_XYZ -0.025 0.0 16@ rotation_velocitiesXY 0.02 0.0 unk 0.01  
+07D5: set_car 1@ velocity_in_direction_XYZ 17@ 0.0 16@ rotation_velocitiesXY -0.02 0.02 unk 0.0  
 01C3: remove_references_to_car 1@
 15@ = 1
 else
-07D5: set_car 1@ velocity_in_direction_XYZ 0.025 0.0 16@ rotation_velocitiesXY -0.02 0.0 unk 0.01
+07D5: set_car 1@ velocity_in_direction_XYZ 18@ 0.0 16@ rotation_velocitiesXY 0.02 -0.02 unk 0.0
 01C3: remove_references_to_car 1@
 15@ = 0
 end
