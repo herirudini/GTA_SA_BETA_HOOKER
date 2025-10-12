@@ -153,9 +153,9 @@ end
 if 10@ < 1000
 then
 9@ = 25
-16@ = 0.055
-17@ = 0.02
-18@ = -0.02
+16@ = 0.06
+17@ = 0.025
+18@ = -0.025
 end
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 1.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 gosub @BOUNCE
