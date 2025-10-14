@@ -98,8 +98,9 @@ then
     gosub @WAIT_1000 
     Actor.StorePos(3@, 5@, 6@, 7@)
     073F: get_actor_in_sphere 5@ 6@ 7@ radius 18.0 with_pedtype_civilian 1 gang 1 criminal/prostitute 0 handle_as 8@
-    if
+    if and
     8@ < 1 
+    01C1:   is_car_stopped 1@ 
     then
         00BC: show_text_highpriority GXT 'PROS_02' time 4000 flag 1 // "This seems an ok place"
         03C8: set_camera_directly_before_player
@@ -114,6 +115,7 @@ else
 end
 
 :JACKED_FP 
+0001: wait 0 ms 
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1     
 0605: actor 3@ perform_animation "BJ_CAR_END_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
@@ -129,8 +131,7 @@ Player.Money($PLAYER_CHAR) += -10
 0624: add 10.0 to_float_stat 33
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
 0605: As_actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
-gosub @WAIT_500 
-gosub @WAIT_300
+gosub @WAIT_1000 
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 10@ = 6000
 15@ = 0
@@ -198,6 +199,7 @@ end
 return
 
 :JACKED_GG
+0001: wait 0 ms
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_END_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
 0605: As_actor 3@ perform_animation "SEX_CAR_END_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1 
@@ -215,17 +217,13 @@ Actor.Health($PLAYER_ACTOR) = 0@
 return
 
 :WASTING
+0001: wait 0 ms
 00BC: show_text_highpriority GXT 'PROS_09' time 4000 flag 1 // "Stop wasting my time!"
 jump @ENDED
 
-:CHECK
-gosub @DEFINED
-gosub @NOT_DEAD
-gosub @IN_CAR
-gosub @LOCK
-return
 
 :DEFINED
+0001: wait 0 ms
 if 056D:   does_char_exist 3@
 then
 return
@@ -235,7 +233,7 @@ end
 
 :NOT_DEAD
 0001: wait 0 ms 
-if or
+00D6: if or
 0118: actor $PLAYER_ACTOR dead 
 0118: actor 3@ dead
 0112: has_deatharrest_been_executed 
@@ -257,7 +255,7 @@ then
     jump @WASTING
     else
         if
-        08A7:   is_car_door_fully_open 1@ door 2
+        08A7:   is_car_door_fully_open 1@ door 2 // CJ Being jacked or car door breaks
         then
         jump @ENDED
         else
@@ -279,8 +277,11 @@ return
 0001: wait 0 ms
 11@ = 300
 repeat
-gosub @CHECK
 11@ -= 100
+gosub @DEFINED
+gosub @NOT_DEAD
+gosub @IN_CAR
+gosub @LOCK
 0001: wait 100 ms
 until 11@ <= 0
 return
@@ -289,36 +290,45 @@ return
 0001: wait 0 ms
 12@ = 500
 repeat
-gosub @CHECK
 12@ -= 100
+gosub @DEFINED
+gosub @NOT_DEAD
+gosub @IN_CAR
+gosub @LOCK
 0001: wait 100 ms
 until 12@ <= 0
 return
 
 :WAIT_1000
 0001: wait 0 ms
-13@ = 2000
+13@ = 1000
 repeat
-gosub @CHECK
 13@ -= 100
+gosub @DEFINED
+gosub @NOT_DEAD
+gosub @IN_CAR
+gosub @LOCK
 0001: wait 100 ms
 until 13@ <= 0
 return
 
 :WAIT_BB
 0001: wait 0 ms
-14@ = 9@
+14@ = 0
 repeat
-gosub @CHECK
+14@ += 25
+gosub @DEFINED
+gosub @NOT_DEAD
+gosub @IN_CAR
+gosub @LOCK
 00D6: if or
 00E1:   player 0 pressed_key 14 // Acelerate
 00E1:   player 0 pressed_key 16 // Brake/Reverse
 then
-    0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
+    0221: set_player $PLAYER_CHAR apply_brakes_to_car 0 
 end
-14@ -= 25  
-0001: wait 25 ms 
-until 14@ <= 0
+0001: wait 25 ms
+until 14@ >= 9@
 return 
 
 :ENDED
@@ -357,7 +367,7 @@ then
 01C2: mark_char_as_no_longer_needed 3@
 3@ = -1
 end
-if or
+00D6: if or
 1@ > -1
 3@ > -1
 then
@@ -386,7 +396,9 @@ end
 // RESET Bounce effect
 15@ = 0
 16@ = 0 
-if or
+17@ = 0 
+18@ = 0 
+00D6: if or
 9@ > 0
 10@ > 0
 11@ > 0
