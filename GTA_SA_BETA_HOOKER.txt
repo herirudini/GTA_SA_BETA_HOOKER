@@ -137,9 +137,9 @@ gosub @WAIT_300
 10@ = 6000
 15@ = 0
 9@ = 50
-16@ = 0.05
-17@ = 0.03
-18@ = -0.03
+16@ = 0.06
+17@ = 0.02
+18@ = -0.02
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
 jump @WATCH_BB
 
