@@ -20,6 +20,8 @@ that .ifp file is not mine, i found it somwhere on the internet and i forgot the
 I have no idea if it's a custom ifp or original.
 That file is needed for the SEX_CAR IFP animation
 
+============================
+
 this mod works with any controler do you prefer!
 - Keyboard & mouse
 - Regular joypad

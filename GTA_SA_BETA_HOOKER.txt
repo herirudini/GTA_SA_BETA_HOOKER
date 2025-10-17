@@ -255,8 +255,9 @@ then
     then
     jump @WASTING
     else
-        if
-        08A7:   is_car_door_fully_open 1@ door 2 // CJ Being jacked or car door breaks
+        00D6: if or  // CJ Being jacked, busted, or car front door breaks
+        08A7:   is_car_door_fully_open 1@ door 2
+        08A7:   is_car_door_fully_open 1@ door 3
         then
         jump @ENDED
         else
@@ -269,9 +270,9 @@ end
 
 :LOCK
 0001: wait 0 ms 
-0526: set_actor 3@ stay_in_car_when_jacked 1   
-039E: set_actor 3@ locked 1 while_in_car 
-07CC: set_player 3@ can_enter_exit_vehicles 0
+//020A: lock_car_doors 1@ mode 5
+0526: set_char_stay_in_car_when_jacked 3@ to 1   
+039E: set_char_cant_be_dragged_out 3@ to 1
 return
 
 :WAIT_300
@@ -338,9 +339,8 @@ gosub @RESET
 if 
 8431: not car 1@ passenger_seat_free 0
 then
-0526: set_actor 3@ stay_in_car_when_jacked 0   
-039E: set_actor 3@ locked 0 while_in_car 
-07CC: set_player 3@ can_enter_exit_vehicles 1   
+0526: set_char_stay_in_car_when_jacked 3@ to 0   
+039E: set_char_cant_be_dragged_out 3@ to 0 
 0633: AS_actor 3@ exit_car
 05DE: AS_actor 3@ walk_around_ped_path
 //0001: wait 5000 ms  // THIS IS THE BUG: If hooker late to get out from car it will re-registered
