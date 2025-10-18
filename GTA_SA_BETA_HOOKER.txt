@@ -66,10 +66,26 @@ else_jump @INIT
 0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
 if 3@ > -1
 else_jump @INIT
-089F: get_actor 3@ pedtype_to 4@
-if 4@ == 22 
+//089F: get_actor 3@ pedtype_to 4@
+//if 4@ == 22 
+00D6: if or
+02F2:   actor 3@ model == #BFYPRO
+02F2:   actor 3@ model == #HFYPRO 
+02F2:   actor 3@ model == #WFYPRO 
+02F2:   actor 3@ model == #SFYPRO
+then
+jump @PREPARE 
+else
+00D6: if or
+02F2:   actor 3@ model == #SWFOPRO
+02F2:   actor 3@ model == #SBFYPRO
+02F2:   actor 3@ model == #SHFYPRO
+02F2:   actor 3@ model == #VWFYPRO
+02F2:   actor 3@ model == #VBFYPRO
+02F2:   actor 3@ model == #VHFYPRO
 else_jump @INIT
-jump @PREPARE
+jump @PREPARE 
+end
 
 :PREPARE
 0001: wait 0 ms
@@ -235,10 +251,15 @@ end
 :NOT_DEAD
 0001: wait 0 ms 
 00D6: if or
-0118: actor $PLAYER_ACTOR dead 
-0118: actor 3@ dead
-0112: has_deatharrest_been_executed 
+0117: is_player_dead $PLAYER_CHAR
+0119: is_car_dead 1@     
+//8118: actor $PLAYER_ACTOR dead 
+//8118: actor 3@ dead
+//0112: has_deatharrest_been_executed 
 then
+05BE: task_die 3@
+0001: wait 100 ms
+034F: remove_char_elegantly 3@
 jump @TERMINATE
 else
 return
@@ -255,9 +276,9 @@ then
     then
     jump @WASTING
     else
-        00D6: if or  // CJ Being jacked, busted, or car front door breaks
+        00D6: if  // CJ Being jacked, busted, or car front door breaks
         08A7:   is_car_door_fully_open 1@ door 2
-        08A7:   is_car_door_fully_open 1@ door 3
+        //08A7:   is_car_door_fully_open 1@ door 3
         then
         jump @ENDED
         else
