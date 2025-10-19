@@ -147,7 +147,7 @@ Player.Money($PLAYER_CHAR) += -10
 0624: add 10.0 to_float_stat 33
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
 0605: As_actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
-gosub @WAIT_500 
+gosub @WAIT_300 
 gosub @WAIT_300
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 10@ = 6000
@@ -253,9 +253,6 @@ end
 00D6: if or
 0117: is_player_dead $PLAYER_CHAR
 0119: is_car_dead 1@     
-//8118: actor $PLAYER_ACTOR dead 
-//8118: actor 3@ dead
-//0112: has_deatharrest_been_executed 
 then
 05BE: task_die 3@
 0001: wait 100 ms
@@ -276,9 +273,9 @@ then
     then
     jump @WASTING
     else
-        00D6: if  // CJ Being jacked, busted, or car front door breaks
+        00D6: if or // CJ Being jacked, busted, or car front door breaks
         08A7:   is_car_door_fully_open 1@ door 2
-        //08A7:   is_car_door_fully_open 1@ door 3
+        0741:   actor $PLAYER_ACTOR busted
         then
         jump @ENDED
         else
@@ -291,9 +288,7 @@ end
 
 :LOCK
 0001: wait 0 ms 
-//020A: lock_car_doors 1@ mode 5
 0526: set_char_stay_in_car_when_jacked 3@ to 1   
-039E: set_char_cant_be_dragged_out 3@ to 1
 return
 
 :WAIT_300
@@ -356,15 +351,13 @@ return
 
 :ENDED
 0001: wait 0 ms
-gosub @RESET 
 if 
 8431: not car 1@ passenger_seat_free 0
 then
 0526: set_char_stay_in_car_when_jacked 3@ to 0   
-039E: set_char_cant_be_dragged_out 3@ to 0 
+gosub @RESET
 0633: AS_actor 3@ exit_car
 05DE: AS_actor 3@ walk_around_ped_path
-//0001: wait 5000 ms  // THIS IS THE BUG: If hooker late to get out from car it will re-registered
 jump @ENDED
 else
 jump @TERMINATE
@@ -394,7 +387,8 @@ end
 3@ > -1
 then
 jump @TERMINATE
-else
+else 
+0001: wait 1000 ms
 jump @INIT
 end
 
