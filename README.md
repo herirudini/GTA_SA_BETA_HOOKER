@@ -21,6 +21,7 @@ I have no idea if it's a custom ifp or original.
 That file is needed for the SEX_CAR IFP animation
 
 ============================
+OPTIONAL: Copy popcycle.dat into data folder, this is to solve when almost couldnt find hooker in small countries
 
 this mod works with any controler do you prefer!
 - Keyboard & mouse
