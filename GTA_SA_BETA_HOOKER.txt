@@ -16,6 +16,8 @@
 // 15@ 16@ 17@ 18@: RandomNumber
 
 {$CLEO .cs}
+{$USE CLEO+}
+
 03A4: name_thread 'BETA_HOOKER'
 
 :BETA_HOOKER
@@ -150,30 +152,25 @@ Player.Money($PLAYER_CHAR) += -10
 gosub @WAIT_300 
 gosub @WAIT_300
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 4.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
-10@ = 6000
+10@ = 900
 15@ = 0
-9@ = 50
-16@ = 0.06
-17@ = 0.02
-18@ = -0.02
-0221: set_player $PLAYER_CHAR apply_brakes_to_car 1
+9@ = 30 
+0221: set_player $PLAYER_CHAR apply_brakes_to_car 1  
+//0EA5: get_closest_cop_near_char 1@ radius 2@ alive 3@ in_car 4@ on_foot 5@ seen_in_front 6@ store_to 7@
 jump @WATCH_BB
 
 :WATCH_BB
 0001: wait 0 ms
-if 10@ < 3000
+if and 
+10@ < 750
+10@ >= 400
 then
-9@ = 25 
-16@ = 0.05
-17@ = 0.025
-18@ = -0.025
+9@ = 15
 end
-if 10@ < 1000
+if 
+10@ < 400
 then
-9@ = 25
-16@ = 0.06
-17@ = 0.025
-18@ = -0.025
+9@ = 10
 end
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 1.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
 gosub @BOUNCE
@@ -183,6 +180,7 @@ gosub @WAIT_BB
 00D6: if or
 00E1:   player 0 pressed_key 14 // Acelerate
 00E1:   player 0 pressed_key 16 // Brake/Reverse
+//01C1: not is_car_stopped 1@ 
 then
     10@ = 0
     0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
@@ -195,22 +193,38 @@ else
         jump @ENDED
     else     
         jump @WATCH_BB
-    end
+    end 
 end
 
 :BOUNCE
 0001: wait 0 ms
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
-// apply bouncing 
-if 15@ == 0
+//097A: play_audio_at $TEMPVAR_X_COORD $TEMPVAR_Y_COORD $TEMPVAR_Z_COORD event 132032
+//018D: NOP $TEMPVAR_X_COORD $TEMPVAR_Y_COORD $TEMPVAR_Z_COORD 132032 20@
+//playSFX("GENRL", 132, 032, true) 
+if 10@ > 550
 then
-07D5: set_car 1@ velocity_in_direction_XYZ 17@ 18@ 16@ rotation_velocitiesXY 0.02 0.02 unk 0.0  
-01C3: remove_references_to_car 1@
-15@ = 1
-else
-07D5: set_car 1@ velocity_in_direction_XYZ 18@ 17@ 16@ rotation_velocitiesXY -0.02 -0.02 unk 0.0
-01C3: remove_references_to_car 1@
-15@ = 0
+    if 15@ == 0
+    then
+    07DA: set_car 1@ rotation_velocity_XYZ 0.0 -0.4 0.0 through_center_of_body 
+    01C3: remove_references_to_car 1@
+    15@ = 1
+    else
+    07DA: set_car 1@ rotation_velocity_XYZ 0.0 0.4 0.0 through_center_of_body
+    01C3: remove_references_to_car 1@
+    15@ = 0
+    end
+else 
+    if 15@ == 0
+    then
+    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY -0.5 0.0 unk 0.0 
+    01C3: remove_references_to_car 1@
+    15@ = 1
+    else
+    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.5 0.0 unk 0.0
+    01C3: remove_references_to_car 1@
+    15@ = 0
+    end
 end
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
 return
@@ -264,18 +278,22 @@ end
 
 :IN_CAR
 0001: wait 0 ms 
-if and
+if and 
 00DB: actor $PLAYER_ACTOR in_car 1@  
 00DB: actor 3@ in_car 1@
 then 
     if
-    00E1: player 0 pressed_key 15 // Exit 
+    0E4A: is_char_exiting_any_car $PLAYER_ACTOR
     then
     jump @WASTING
     else
+        //080E: get_actor $PLAYER_ACTOR ped_event_to 19@
         00D6: if or // CJ Being jacked, busted, or car front door breaks
         08A7:   is_car_door_fully_open 1@ door 2
         0741:   actor $PLAYER_ACTOR busted
+        //19@ == 7
+        //074F:   actor $PLAYER_CHAR ped_event == 7
+        //074F:   is_char_responding_to_event $PLAYER_ACTOR event 7
         then
         jump @ENDED
         else
@@ -334,7 +352,7 @@ return
 0001: wait 0 ms
 14@ = 0
 repeat
-14@ += 25
+14@ += 10
 gosub @DEFINED
 gosub @NOT_DEAD
 gosub @IN_CAR
@@ -345,7 +363,7 @@ gosub @LOCK
 then
     0221: set_player $PLAYER_CHAR apply_brakes_to_car 0 
 end
-0001: wait 25 ms
+0001: wait 10 ms
 until 14@ >= 9@
 return 
 
