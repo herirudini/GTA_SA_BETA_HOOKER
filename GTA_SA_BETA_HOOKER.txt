@@ -126,6 +126,7 @@ end
 :FOREPLAY
 0001: wait 0 ms
 gosub @DEFINED
+039E: set_char_cant_be_dragged_out 3@ to 0
 0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1
 03FE: set_actor 3@ money 5
 Player.Money($PLAYER_CHAR) += -5
@@ -205,7 +206,6 @@ then
 9@ = 10
 end
 0812: AS_actor 3@ perform_animation "SEX_CAR_LOOP_W" IFP "SEX_CAR" framedelta 1.0 loopA 1 lockX 0 lockY 0 lockF 0 time -1 
-
 gosub @BOUNCE
 gosub @WAIT_BB
 gosub @DEFINED
@@ -224,7 +224,8 @@ then
     10@ = 0
     jump @WASTING
 else
-    00D6: if 10@ <= 0 
+    00D6: if 
+    10@ <= 0 
     then
         gosub @JACKED_BB
         jump @ENDED
@@ -240,29 +241,26 @@ end
 //018D: NOP $TEMPVAR_X_COORD $TEMPVAR_Y_COORD $TEMPVAR_Z_COORD 132032 20@
 //playSFX("GENRL", 132, 032, true)
 05C1: AS_actor 3@ speak_from_audio_table 116 
-00D6: if 10@ > 550
+00D6: if 
+16@ == 0
 then
-    00D6: if 16@ == 0
+07DA: set_car 1@ rotation_velocity_XYZ 0.0 -0.35 0.0 through_center_of_body
+    00D6: if 
+    10@ < 550
     then
-    07DA: set_car 1@ rotation_velocity_XYZ 0.0 -0.35 0.0 through_center_of_body 
-    01C3: remove_references_to_car 1@
-    16@ = 1
-    else
-    07DA: set_car 1@ rotation_velocity_XYZ 0.0 0.35 0.0 through_center_of_body
-    01C3: remove_references_to_car 1@
-    16@ = 0
-    end
-else 
-    00D6: if 16@ == 0
+    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 0.0 unk 0.0 
+    end 
+01C3: remove_references_to_car 1@
+16@ = 1
+else
+07DA: set_car 1@ rotation_velocity_XYZ 0.0 0.35 0.0 through_center_of_body
+    00D6: if 
+    10@ < 550
     then
-    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 -0.4 unk 0.0 
-    01C3: remove_references_to_car 1@
-    16@ = 1
-    else
-    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 0.4 unk 0.0
-    01C3: remove_references_to_car 1@
-    16@ = 0
-    end
+    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 0.0 unk 0.0 
+    end 
+01C3: remove_references_to_car 1@
+16@ = 0
 end
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
 return
@@ -367,6 +365,7 @@ return
 return
 
 :CHECK
+0001: wait 0 ms
 gosub @DEFINED
 gosub @NOT_DEAD
 gosub @IN_CAR
