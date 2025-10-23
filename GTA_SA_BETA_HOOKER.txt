@@ -126,7 +126,6 @@ end
 :FOREPLAY
 0001: wait 0 ms
 gosub @DEFINED
-039E: set_char_cant_be_dragged_out 3@ to 0
 0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1
 03FE: set_actor 3@ money 5
 Player.Money($PLAYER_CHAR) += -5
@@ -444,7 +443,7 @@ return
 0001: wait 0 ms 
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
 00D6: if and
-8431: not car 1@ passenger_seat_free 0
+056E: car 1@ defined
 00DB: actor 3@ in_car 1@
 then
 gosub @RESET
