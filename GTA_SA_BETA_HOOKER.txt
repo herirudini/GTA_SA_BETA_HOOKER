@@ -315,10 +315,14 @@ end
 0117: is_player_dead $PLAYER_CHAR
 0119: is_car_dead 1@     
 then
-05BE: task_die 3@
-0001: wait 100 ms
-034F: remove_char_elegantly 3@
-jump @TERMINATE
+    00D6: if
+    0119: is_car_dead 1@
+    then
+    05BE: task_die 3@
+    jump @TERMINATE
+    else
+    jump @ENDED
+    end
 else
 return
 end
@@ -447,7 +451,7 @@ return
 00DB: actor 3@ in_car 1@
 then
 gosub @RESET
-0633: AS_actor 3@ exit_car
+0633: task_leave_any_car 3@
 05DE: AS_actor 3@ walk_around_ped_path
 end
 jump @TERMINATE
