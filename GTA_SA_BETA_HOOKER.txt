@@ -22,12 +22,13 @@
 {$USE CLEO+}
 
 :BET_HKR
+wait 2000
 00D6: if
 $BET_HKRON == 0
 then
     03A4: name_thread 'BTHKMTR' 
     :BTHKMTR
-    wait 1000
+    wait 2000
     //03F0: enable_text_draw 1
     //045A: draw_text_1number 200.0 40.0 GXT 'NUMBER' number $BET_HKRON
     00D6: if
