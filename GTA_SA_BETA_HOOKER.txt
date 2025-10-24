@@ -249,7 +249,7 @@ then
     then
     07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 0.0 unk 0.0 
     end 
-01C3: remove_references_to_car 1@
+01C3: mark_car_as_no_longer_needed 1@
 16@ = 1
 else
 07DA: set_car 1@ rotation_velocity_XYZ 0.0 0.35 0.0 through_center_of_body
@@ -258,7 +258,7 @@ else
     then
     07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 -0.025 rotation_velocitiesXY 0.0 0.0 unk 0.0 
     end 
-01C3: remove_references_to_car 1@
+01C3: mark_car_as_no_longer_needed 1@
 16@ = 0
 end
 1@ = Actor.CurrentCar($PLAYER_ACTOR)
@@ -461,22 +461,15 @@ jump @TERMINATE
 gosub @UNLOCK_CJ
 gosub @RESET 
 0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
-0687: clear_actor $PLAYER_ACTOR task
-00D6: if 
-056E: car 1@ defined
-then
-    07D5: set_car 1@ velocity_in_direction_XYZ 0.0 0.0 0.0 rotation_velocitiesXY 0.0 0.0 unk 0.0
-    01C3: mark_car_as_no_longer_needed 1@
-    1@ = -1
-end
+//0687: clear_actor $PLAYER_ACTOR task
 00D6: if 
 056D: actor 3@ defined
 then
     0687: clear_actor 3@ task
     01C2: mark_char_as_no_longer_needed 3@
-    3@ = -1
+    //3@ = -1
 end
-0001: wait 500 ms
+//0001: wait 500 ms
 $BET_HKRON = 0
 jump @BET_HKR0
 
