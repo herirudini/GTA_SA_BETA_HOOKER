@@ -15,8 +15,7 @@
 // 9@: LoopSpeed
 // 10@ 11@ 12@ 13@ 14@ 15@: Timers
 // 16@: Bounce direction flip 
-// 17@: Police
-// 18@: unused
+// 17@: CarSpeed
 
 {$CLEO}
 {$USE CLEO+}
@@ -76,7 +75,7 @@ jump @INIT
 end 
 
 :INIT 
-0001: wait 1000 ms
+0001: wait 0 ms
 00D6: if 
 Actor.Driving($PLAYER_ACTOR) 
 else_jump @INIT    
@@ -125,7 +124,7 @@ end
 
 :FOREPLAY
 0001: wait 0 ms
-gosub @DEFINED
+gosub @WAIT_1000
 0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1
 03FE: set_actor 3@ money 5
 Player.Money($PLAYER_CHAR) += -5
@@ -187,12 +186,18 @@ gosub @WAIT_300
 16@ = 0
 9@ = 30
 gosub @UNLOCK_CJ 
-0221: set_player $PLAYER_CHAR apply_brakes_to_car 1  
-//0EA5: get_closest_cop_near_char $PLAYER_CHAR radius 18.0 alive 1 in_car 1 on_foot 1 seen_in_front 0 store_to 17@
+00A9: car_set_idle 1@  
 jump @WATCH_BB
 
 :WATCH_BB
 0001: wait 0 ms
+//0EA5: 18@ = get_closest_cop_near_char $PLAYER_ACTOR radius 18.0 alive 1 inCar 1 onFoot 1 seenInFront 1
+//00D6: if
+//056D:   does_char_exist 18@
+//then  
+//09B6: set_char_wanted_by_police $PLAYER_CHAR to 1
+//09B6: set_char_wanted_by_police 5@ to 1
+//end
 00D6: if and 
 10@ < 750
 10@ >= 400
@@ -214,12 +219,10 @@ gosub @NOT_DEAD
 gosub @BOUNCE
 gosub @WAIT_BB
 gosub @IN_CAR
-//10@ = 10@ - 9@
 Dec(10@,9@)
-00D6: if or
-00E1:   player 0 pressed_key 14 // Acelerate
-00E1:   player 0 pressed_key 16 // Brake/Reverse
-//01C1: not is_car_stopped 1@ 
+02E3: 17@ = get_car_speed 1@
+00D6: if
+17@ > 1075000000 
 then
     10@ = 0
     jump @WASTING
@@ -275,7 +278,6 @@ repeat
 then
     gosub @BOUNCE
     0001: wait 10 ms
-    //15@ -= 10
     Dec(15@,10)
 else
     break
@@ -382,7 +384,6 @@ repeat
 00D6: if 
 11@ > 0
 then
-    //11@ -= 100
     Dec(11@,100)
     gosub @CHECK
     0001: wait 100 ms
@@ -399,7 +400,6 @@ repeat
 00D6: if 
 12@ > 0
 then
-    //12@ -= 100
     Dec(12@,100)
     gosub @CHECK
     0001: wait 100 ms
@@ -416,7 +416,6 @@ repeat
 00D6: if 
 13@ > 0
 then
-    //13@ -= 100
     Dec(13@,100)
     gosub @CHECK
     0001: wait 100 ms
@@ -433,14 +432,7 @@ repeat
 00D6: if 
 14@ > 0
 then
-    //14@ -= 10
     Dec(14@,10)
-    00D6: if or
-    00E1:   player 0 pressed_key 14 // Acelerate
-    00E1:   player 0 pressed_key 16 // Brake/Reverse
-    then
-        0221: set_player $PLAYER_CHAR apply_brakes_to_car 0 
-    end
     0001: wait 10 ms
 else
     break
@@ -465,16 +457,12 @@ jump @TERMINATE
 0001: wait 0 ms
 gosub @UNLOCK_CJ
 gosub @RESET 
-0221: set_player $PLAYER_CHAR apply_brakes_to_car 0
-//0687: clear_actor $PLAYER_ACTOR task
 00D6: if 
 056D: actor 3@ defined
 then
     0687: clear_actor 3@ task
     01C2: mark_char_as_no_longer_needed 3@
-    //3@ = -1
 end
-//0001: wait 500 ms
 $BET_HKRON = 0
 jump @BET_HKR0
 
