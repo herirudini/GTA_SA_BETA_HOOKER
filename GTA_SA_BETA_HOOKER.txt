@@ -18,17 +18,17 @@
 // 17@: Police
 // 18@: unused
 
-{$CLEO .cs}
+{$CLEO}
 {$USE CLEO+}
 
 :BET_HKR
-wait 2000
+0001: wait 1000 ms
 00D6: if
 $BET_HKRON == 0
 then
     03A4: name_thread 'BTHKMTR' 
     :BTHKMTR
-    wait 2000
+    0001: wait 1000 ms
     //03F0: enable_text_draw 1
     //045A: draw_text_1number 200.0 40.0 GXT 'NUMBER' number $BET_HKRON
     00D6: if
@@ -44,6 +44,7 @@ jump @BET_HKR0
 end
 
 :BET_HKR0
+0001: wait 0 ms
 00D6: if
 $BET_HKRON == 0
 then
@@ -51,7 +52,7 @@ then
 else
 03A4: name_thread 'BET_HKR'
 :BET_HKR1
-0001: wait 0 ms
+0001: wait 1000 ms
 //03F0: enable_text_draw 1
 //045A: draw_text_1number 200.0 100.0 GXT 'NUMBER' number $BET_HKRON
 04ED: load_animation "BLOWJOBZ" 
@@ -77,7 +78,7 @@ end
 :INIT 
 0001: wait 1000 ms
 00D6: if 
-00DF:   actor $PLAYER_ACTOR driving 
+Actor.Driving($PLAYER_ACTOR) 
 else_jump @INIT    
 00D6: if and
 Player.Defined($PLAYER_CHAR)
@@ -103,8 +104,6 @@ else_jump @INIT
 00D6: if 
 056D:   does_char_exist 3@
 else_jump @INIT
-//089F: get_actor 3@ pedtype_to 18@
-//00D6: if 18@ == 22 
 00D6: if or
 02F2:   actor 3@ model == #BFYPRO
 02F2:   actor 3@ model == #HFYPRO 
@@ -215,7 +214,8 @@ gosub @NOT_DEAD
 gosub @BOUNCE
 gosub @WAIT_BB
 gosub @IN_CAR
-10@ = 10@ - 9@
+//10@ = 10@ - 9@
+Dec(10@,9@)
 00D6: if or
 00E1:   player 0 pressed_key 14 // Acelerate
 00E1:   player 0 pressed_key 16 // Brake/Reverse
@@ -275,7 +275,8 @@ repeat
 then
     gosub @BOUNCE
     0001: wait 10 ms
-    15@ -= 10
+    //15@ -= 10
+    Dec(15@,10)
 else
     break
 end
@@ -328,30 +329,29 @@ else
 return
 end
 
-:IN_CAR
+:IN_CAR // CJ Being jacked, busted, or exits
 0001: wait 0 ms 
 00D6: if and 
 00DB: actor $PLAYER_ACTOR in_car 1@  
 00DB: actor 3@ in_car 1@
-then 
-    00D6: if
-    0E4A: is_char_exiting_any_car $PLAYER_ACTOR
+then
+    00D6: if or
+    0741: actor $PLAYER_ACTOR busted 
+    0E42: is_char_doing_task_id $PLAYER_ACTOR 818 //TASK_SIMPLE_CAR_QUICK_BE_DRAGGED_OUT
+    0E42: is_char_doing_task_id $PLAYER_ACTOR 821 //TASK_SIMPLE_CAR_SLOW_BE_DRAGGED_OUT
+    0E42: is_char_doing_task_id $PLAYER_ACTOR 823 //TASK_COMPLEX_CAR_SLOW_BE_DRAGGED_OUT
+    0E42: is_char_doing_task_id $PLAYER_ACTOR 825 //TASK_COMPLEX_CAR_QUICK_BE_DRAGGED_OUT
     then
-    jump @WASTING
+        jump @ENDED     
     else
-        //080E: get_actor $PLAYER_ACTOR ped_event_to 19@
-        00D6: if or // CJ Being jacked, busted, or car front door breaks
-        08A7:   is_car_door_fully_open 1@ door 2
-        0741:   actor $PLAYER_ACTOR busted
-        //19@ == 7
-        //074F:   actor $PLAYER_CHAR ped_event == 7
-        //074F:   is_char_responding_to_event $PLAYER_ACTOR event 7
+        00D6: if
+        0E4A: is_char_exiting_any_car $PLAYER_ACTOR
         then
-        jump @ENDED
+        jump @WASTING
         else
-        return  
-        end     
-    end
+        return
+        end 
+    end  
 else
 jump @ENDED
 end
@@ -382,7 +382,8 @@ repeat
 00D6: if 
 11@ > 0
 then
-    11@ -= 100
+    //11@ -= 100
+    Dec(11@,100)
     gosub @CHECK
     0001: wait 100 ms
 else
@@ -398,7 +399,8 @@ repeat
 00D6: if 
 12@ > 0
 then
-    12@ -= 100
+    //12@ -= 100
+    Dec(12@,100)
     gosub @CHECK
     0001: wait 100 ms
 else
@@ -414,7 +416,8 @@ repeat
 00D6: if 
 13@ > 0
 then
-    13@ -= 100
+    //13@ -= 100
+    Dec(13@,100)
     gosub @CHECK
     0001: wait 100 ms
 else
@@ -430,7 +433,8 @@ repeat
 00D6: if 
 14@ > 0
 then
-    14@ -= 10
+    //14@ -= 10
+    Dec(14@,10)
     00D6: if or
     00E1:   player 0 pressed_key 14 // Acelerate
     00E1:   player 0 pressed_key 16 // Brake/Reverse
