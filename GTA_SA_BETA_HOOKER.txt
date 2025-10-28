@@ -4,7 +4,8 @@
 //00BC GXT 'PROS_09' // "Stop wasting my time!"
 //00BC GXT 'PROS_02' // "This seems an ok place"
 // VARIABLES:
-// $BET_HKRON: Flag if the mod is on/off
+// $BET_HKRON: Flag is the mod on/off
+// $BET_INIT: Flag is the main loop have been triggered
 // 0@: Health
 // 1@: CarTarget
 // 2@: CarSeat
@@ -21,21 +22,25 @@
 {$USE CLEO+}
 
 :BET_HKR
-0001: wait 1000 ms
-00D6: if
+00D6: if or //Make sure the main loop run first
 $BET_HKRON == 0
+not $BET_INIT == 1
 then
+    $BET_INIT = 1
+    $BET_HKRON = 0
     03A4: name_thread 'BTHKMTR' 
     :BTHKMTR
     0001: wait 1000 ms
     //03F0: enable_text_draw 1
-    //045A: draw_text_1number 200.0 40.0 GXT 'NUMBER' number $BET_HKRON
+    //045A: draw_text_1number 200.0 20.0 GXT 'NUMBER' number $BET_HKRON
     00D6: if
     $BET_HKRON == 0
     then
         //03E5: show_text_highpriority GXT 'CLOTHC' time 5000 flag 1
-        $BET_HKRON = 1 // mark as running
+        $BET_HKRON = 1 // mark as running 
+        0001: wait 1000 ms
         0A92: create_custom_thread "GTA_SA_BETA_HOOKER.cs"
+        0001: wait 1000 ms
     end
     jump @BTHKMTR
 else
@@ -47,13 +52,13 @@ end
 00D6: if
 $BET_HKRON == 0
 then
-0459: terminate_all_scripts_with_this_name 'BET_HKR'
-else
+//0459: terminate_all_scripts_with_this_name 'BET_HKR'
+//0A93: terminate_this_custom_script
+0ABA: terminate_all_custom_scripts_with_this_name 'BET_HKR'
+end
 03A4: name_thread 'BET_HKR'
 :BET_HKR1
 0001: wait 1000 ms
-//03F0: enable_text_draw 1
-//045A: draw_text_1number 200.0 100.0 GXT 'NUMBER' number $BET_HKRON
 04ED: load_animation "BLOWJOBZ" 
 04ED: load_animation "SEX_CAR" 
 04ED: load_animation "CAR_CHAT" 
@@ -72,10 +77,11 @@ var
 end     
 gosub @RESET
 jump @INIT
-end 
 
 :INIT 
-0001: wait 0 ms
+0001: wait 50 ms
+//03F0: enable_text_draw 1
+//045A: draw_text_1number 220.0 20.0 GXT 'NUMBER' number $BET_HKRON
 00D6: if 
 Actor.Driving($PLAYER_ACTOR) 
 else_jump @INIT    
@@ -123,8 +129,9 @@ jump @FOREPLAY
 end
 
 :FOREPLAY
-0001: wait 0 ms
-gosub @WAIT_1000
+0001: wait 1000 ms
+gosub @DEFINED
+gosub @IN_CAR
 0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1
 03FE: set_actor 3@ money 5
 Player.Money($PLAYER_CHAR) += -5
