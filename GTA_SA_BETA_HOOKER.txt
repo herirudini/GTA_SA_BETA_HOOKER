@@ -133,9 +133,9 @@ end
 gosub @DEFINED
 gosub @IN_CAR
 0605: As_actor 3@ perform_animation "CAR_SC1_FR" IFP "CAR_CHAT" framedelta 4.0 loop -1 lockX 0 lockY 0 lockF 0 time -1
+0109: player $PLAYER_CHAR money = -5
+0623: increment_int_stat 5 to_integer_stat 33
 03FE: set_actor 3@ money 5
-Player.Money($PLAYER_CHAR) += -5
-0624: add 5.0 to_float_stat 33
 gosub @WAIT_1000 
 0605: As_actor 3@ perform_animation "BJ_CAR_START_W" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
 gosub @WAIT_500 
@@ -181,9 +181,9 @@ return
 :BANGBANG 
 0001: wait 0 ms
 gosub @LOCK_CJ
-03FE: set_actor 3@ money 10
-Player.Money($PLAYER_CHAR) += -10
-0624: add 10.0 to_float_stat 33
+0109: player $PLAYER_CHAR money = -10
+0623: increment_int_stat 10 to_integer_stat 33
+03FE: set_actor 3@ money 15
 0605: As_actor $PLAYER_ACTOR perform_animation "BJ_CAR_START_P" IFP "BLOWJOBZ" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1  
 0605: As_actor 3@ perform_animation "SEX_CAR_START_W" IFP "SEX_CAR" framedelta 4.0 loop 0 lockX 0 lockY 0 lockF 0 time -1
 gosub @WAIT_300 
@@ -301,7 +301,8 @@ return
 :HEALTH_UP
 0001: wait 0 ms
 0@ = Actor.Health($PLAYER_ACTOR)
-Actor.Health($PLAYER_ACTOR) = 0@ + 25
+0@ += 250
+0223: set_actor $PLAYER_ACTOR health_to 0@
 return
 
 :WASTING
