@@ -102,9 +102,6 @@ else_jump @INIT
 00D6: if 
 2@ > 0
 else_jump @INIT
-00D6: if 
-8431:   not car 1@ passenger_seat_free 0  
-else_jump @INIT
 0432: 3@ = get_actor_handle_from_car 1@ passenger_seat 0 
 00D6: if 
 056D:   does_char_exist 3@
@@ -450,13 +447,13 @@ return
 
 :ENDED
 0001: wait 0 ms 
-1@ = Actor.CurrentCar($PLAYER_ACTOR)
 00D6: if and
 056E: car 1@ defined
 00DB: actor 3@ in_car 1@
 then
 gosub @RESET
-0633: task_leave_any_car 3@
+//0633: task_leave_any_car 3@
+0622: task_leave_car_immediately 3@ car 1@
 05DE: AS_actor 3@ walk_around_ped_path
 end
 jump @TERMINATE
