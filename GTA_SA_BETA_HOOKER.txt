@@ -23,7 +23,7 @@
 
 :BET_HKR
 00D6: if or //Make sure the main loop run first
-$BET_HKRON == 0
+not $BET_HKRON == 1
 not $BET_INIT == 1
 then
     $BET_INIT = 1
@@ -37,8 +37,8 @@ then
     $BET_HKRON == 0
     then
         //03E5: show_text_highpriority GXT 'CLOTHC' time 5000 flag 1
-        $BET_HKRON = 1 // mark as running 
         0001: wait 1000 ms
+        $BET_HKRON = 1 // mark as running 
         0A92: create_custom_thread "GTA_SA_BETA_HOOKER.cs"
         0001: wait 1000 ms
     end
@@ -50,7 +50,7 @@ end
 :BET_HKR0
 0001: wait 0 ms
 00D6: if
-$BET_HKRON == 0
+not $BET_HKRON == 1
 then
 //0459: terminate_all_scripts_with_this_name 'BET_HKR'
 //0A93: terminate_this_custom_script
@@ -106,24 +106,10 @@ else_jump @INIT
 00D6: if 
 056D:   does_char_exist 3@
 else_jump @INIT
-00D6: if or
-02F2:   actor 3@ model == #BFYPRO
-02F2:   actor 3@ model == #HFYPRO 
-02F2:   actor 3@ model == #WFYPRO 
-02F2:   actor 3@ model == #SFYPRO
-then
-jump @FOREPLAY
-else
-00D6: if or
-02F2:   actor 3@ model == #SWFOPRO
-02F2:   actor 3@ model == #SBFYPRO
-02F2:   actor 3@ model == #SHFYPRO
-02F2:   actor 3@ model == #VWFYPRO
-02F2:   actor 3@ model == #VBFYPRO
-02F2:   actor 3@ model == #VHFYPRO
+089F: get_actor 3@ pedtype_to 19@
+if 19@ == 22
 else_jump @INIT
 jump @FOREPLAY 
-end
 
 :FOREPLAY
 0001: wait 1000 ms
@@ -351,12 +337,21 @@ then
     then
         jump @ENDED     
     else
-        00D6: if
-        0E4A: is_char_exiting_any_car $PLAYER_ACTOR
+        00D6: if or
+        0E42: is_char_doing_task_id 3@ 818 //TASK_SIMPLE_CAR_QUICK_BE_DRAGGED_OUT
+        0E42: is_char_doing_task_id 3@ 821 //TASK_SIMPLE_CAR_SLOW_BE_DRAGGED_OUT
+        0E42: is_char_doing_task_id 3@ 823 //TASK_COMPLEX_CAR_SLOW_BE_DRAGGED_OUT
+        0E42: is_char_doing_task_id 3@ 825 //TASK_COMPLEX_CAR_QUICK_BE_DRAGGED_OUT
         then
-        jump @WASTING
+            jump @TERMINATE     
         else
-        return
+            00D6: if
+            0E4A: is_char_exiting_any_car $PLAYER_ACTOR
+            then
+            jump @WASTING
+            else
+            return
+            end
         end 
     end  
 else
@@ -452,24 +447,10 @@ return
 00DB: actor 3@ in_car 1@
 then
 gosub @RESET
-//0633: task_leave_any_car 3@
 0622: task_leave_car_immediately 3@ car 1@
 05DE: AS_actor 3@ walk_around_ped_path
 end
 jump @TERMINATE
-
-:TERMINATE
-0001: wait 0 ms
-gosub @UNLOCK_CJ
-gosub @RESET 
-00D6: if 
-056D: actor 3@ defined
-then
-    0687: clear_actor 3@ task
-    01C2: mark_char_as_no_longer_needed 3@
-end
-$BET_HKRON = 0
-jump @BET_HKR0
 
 :RESET
 0001: wait 0 ms
@@ -482,3 +463,17 @@ jump @BET_HKR0
 14@ = 0
 15@ = 0 
 return
+
+:TERMINATE
+0001: wait 0 ms
+gosub @UNLOCK_CJ
+gosub @RESET
+0001: wait 100 ms 
+00D6: if 
+056D: actor 3@ defined
+then
+    0687: clear_actor 3@ task
+    01C2: mark_char_as_no_longer_needed 3@
+end
+$BET_HKRON = 0
+0ABA: terminate_all_custom_scripts_with_this_name 'BET_HKR'
